@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f1c40f;
+            --danger-color: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f6fa;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            display: inline-block;
+        }
+
+        .status-delivered { background: var(--success-color); color: white; }
+        .status-pending { background: var(--warning-color); color: black; }
+        .status-shipped { background: var(--secondary-color); color: white; }
+        .status-cancelled { background: var(--danger-color); color: white; }
+
+        .financial-status {
+            font-weight: bold;
+        }
+
+        .paid { color: var(--success-color); }
+        .unpaid { color: var(--danger-color); }
+        .refunded { color: var(--warning-color); }
+
+        #incomeDisplay {
+            color: var(--success-color);
+            margin: 15px 0;
+            font-size: 1.8em;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    
+    <div class="dashboard">
+        <!-- Income Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Financial Overview</h2>
+            </div>
+            <h2 id="incomeDisplay">Loading...</h2>
+            <div class="financial-summary">
+                <p>Pending Payments: $1,250</p>
+                <p>Completed Transactions: $8,750</p>
+            </div>
+        </div>
+
+        <!-- Recent Orders Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Recent Orders</h2>
+            </div>
+            <div class="recent-orders">
+                <ul id="recentOrdersList" style="list-style: none; padding: 0;">
+                    <!-- JavaScript will populate this -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card" style="margin-top: 20px;">
+        <div class="card-header">
+            <h2>Order Management</h2>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Tracking #</th>
+                    <th>Status</th>
+                    <th>Financial Status</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+                <!-- Sample Data - Replace with dynamic content -->
+                <tr>
+                    <td>#1001</td>
+                    <td>John Doe</td>
+                    <td>TN123456789</td>
+                    <td><span class="status-badge status-delivered">Delivered</span></td>
+                    <td><span class="financial-status paid">Paid</span></td>
+                    <td>$149.99</td>
+                </tr>
+                <tr>
+                    <td>#1002</td>
+                    <td>Jane Smith</td>
+                    <td>TN987654321</td>
+                    <td><span class="status-badge status-shipped">Shipped</span></td>
+                    <td><span class="financial-status unpaid">Unpaid</span></td>
+                    <td>$89.99</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function fetchIncome() {
+            const response = await fetch('/admin/income');
+            const data = await response.json();
+            document.getElementById('incomeDisplay').innerText = `Total Income: $${data.totalIncome}`;
+        }
+
+        // Sample recent orders data (replace with actual API calls)
+        const recentOrders = [
+            { id: '#1001', status: 'Delivered' },
+            { id: '#1002', status: 'Shipped' },
+            { id: '#1003', status: 'Pending' }
+        ];
+
+        function populateRecentOrders() {
+            const list = document.getElementById('recentOrdersList');
+            list.innerHTML = recentOrders.map(order => `
+                <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                    ${order.id} - <span class="status-badge ${getStatusClass(order.status)}">${order.status}</span>
+                </li>
+            `).join('');
+        }
+
+        function getStatusClass(status) {
+            return `status-${status.toLowerCase()}`;
+        }
+
+        // Refresh data
+        setInterval(() => {
+            fetchIncome();
+            populateRecentOrders();
+        }, 5000);
+
+        // Initial load
+        fetchIncome();
+        populateRecentOrders();
+    </script>
+</body>
+</html>

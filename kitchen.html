@@ -1,0 +1,157 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Dashboard - Food Ordering System</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .order-item:hover {
+            transform: translateY(-2px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-blue-600">
+                    <i class="fas fa-utensils"></i> Kitchen Orders
+                </h1>
+                <div class="text-lg font-semibold">
+                    Orders: <span id="orderCount" class="text-green-600">0</span>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <form id="orderForm" class="flex gap-4">
+                    <input type="text" id="orderItems" 
+                           class="flex-1 p-2 border rounded-lg"
+                           placeholder="Enter order items (comma separated)"
+                           required>
+                    <button type="submit" 
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">
+                        <i class="fas fa-plus"></i> Create Order
+                    </button>
+                </form>
+            </div>
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-5 gap-4 font-semibold text-gray-700 px-4">
+                    <div>Token ID</div>
+                    <div>Items</div>
+                    <div>Status</div>
+                    <div>Time</div>
+                    <div>Actions</div>
+                </div>
+                <ul id="orderList" class="space-y-4">
+                    <!-- Orders will be inserted here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-600 text-white p-4 rounded-lg shadow-lg">
+        <span id="toast-message"></span>
+    </div>
+
+    <script>
+        let orders = [];
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.className = `fixed bottom-4 right-4 bg-${type}-600 text-white p-4 rounded-lg shadow-lg`;
+            toast.querySelector('#toast-message').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        function generateToken() {
+            return `TKN-${Date.now().toString(36).slice(-5)}-${Math.random().toString(36).substr(2, 3)}`.toUpperCase();
+        }
+
+        function updateOrderCount() {
+            document.getElementById('orderCount').textContent = orders.length;
+        }
+
+        function updateStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = newStatus;
+                renderOrders();
+                showToast(`Order ${orderId} marked as ${newStatus}`, 'green');
+            }
+        }
+
+        function addOrder(items) {
+            const newOrder = {
+                id: generateToken(),
+                items: items.split(',').map(item => item.trim()),
+                status: 'Preparing',
+                timestamp: new Date().toLocaleTimeString()
+            };
+
+            orders.unshift(newOrder);
+            updateOrderCount();
+            renderOrders();
+            showToast(`New order created: ${newOrder.id}`, 'blue');
+        }
+
+        function renderOrders() {
+            const orderList = document.getElementById('orderList');
+            orderList.innerHTML = orders.map(order => `
+                <li class="order-item bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300">
+                    <div class="grid grid-cols-5 gap-4 items-center">
+                        <div class="font-mono text-blue-600">${order.id}</div>
+                        <div>${order.items.join(', ')}</div>
+                        <div>
+                            <span class="px-3 py-1 rounded-full ${order.status === 'Preparing' ? 
+                                'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}">
+                                ${order.status}
+                            </span>
+                        </div>
+                        <div class="text-gray-500">${order.timestamp}</div>
+                        <div>
+                            ${order.status === 'Preparing' ? 
+                                `<button onclick="updateStatus('${order.id}', 'Ready')" 
+                                   class="bg-green-600 text-white px-4 py-1 rounded-lg hover:bg-green-700 transition duration-300">
+                                    Mark Ready
+                                </button>` :
+                                `<span class="text-gray-400">Completed</span>`}
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // Form submission
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const itemsInput = document.getElementById('orderItems');
+            if (itemsInput.value.trim()) {
+                addOrder(itemsInput.value);
+                itemsInput.value = '';
+            }
+        });
+
+        // Initial sample orders
+        addOrder('Burger, Fries, Coke');
+        addOrder('Pizza, Salad');
+        addOrder('Steak, Mashed Potatoes');
+    </script>
+</body>
+</html>

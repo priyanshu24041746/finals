@@ -1,0 +1,263 @@
+LL\about.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Caffeine Corner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f5f0;
+            color: #4a3520;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: #6f4e37;
+            padding: 1rem 0;
+        }
+        
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            color: #f9f5f0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 2rem;
+        }
+        
+        nav ul li a {
+            color: #f9f5f0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #d4a76a;
+        }
+        
+        .hero {
+            height: 400px;
+            background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .hero::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero-content {
+            text-align: center;
+            color: white;
+            z-index: 1;
+            padding: 0 2rem;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        .about-section {
+            margin-bottom: 4rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #6f4e37;
+            border-bottom: 2px solid #d4a76a;
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+        
+        .about-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .about-image {
+            flex: 1;
+            min-width: 300px;
+            height: 400px;
+            background-image: url('https://images.unsplash.com/photo-1445116572660-236099ec97a0');
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+        }
+        
+        .values {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .value-card {
+            flex: 1;
+            min-width: 250px;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .value-icon {
+            font-size: 2.5rem;
+            color: #d4a76a;
+            margin-bottom: 1rem;
+        }
+        
+        .team-section {
+            margin-top: 5rem;
+        }
+        
+        .team-members {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .team-member {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+        }
+        
+        .team-photo {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+        }
+        
+        footer {
+            background-color: #6f4e37;
+            color: #f9f5f0;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .social-links {
+            margin-top: 1.5rem;
+        }
+        
+        .social-links a {
+            color: #f9f5f0;
+            font-size: 1.5rem;
+            margin: 0 0.5rem;
+            transition: color 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: #d4a76a;
+        }
+       
+    </style>
+</head>
+<body>
+    <header> 
+       
+        <nav>
+            <div class="logo">Quick Bite </div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="menu.html">Menu</a></li>
+                <li><a href="contact.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Our Story</h1>
+            <p>Brewing perfection since 2021</p>
+        </div>
+    </section>
+
+    <main>
+        <section class="about-section">
+            <h2 class="section-title">About Us</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Welcome to Quick Bite, where every cup tells a story and every visit feels like coming home. Founded in 2021, our café began with a simple dream: to create a warm, inviting space where our community could gather and enjoy exceptional coffee.</p>
+                    <br>
+                    <p>What started as a small corner shop has grown into a beloved local institution, but our commitment to quality and personal connection remains unchanged. We source our beans ethically from small-scale farmers around the world, roast them in-house to highlight their unique characteristics, and serve them with a smile that comes from genuine joy in what we do.</p>
+                    <br>
+                    <p>Beyond coffee, we take pride in our handcrafted pastries and wholesome breakfast and lunch options, all made from scratch using locally sourced ingredients whenever possible. Whether you're stopping by for a quick morning espresso, settling in for an afternoon of work with our reliable Wi-Fi, or meeting friends for a relaxed weekend brunch, we've created a space that adapts to your needs while maintaining the quality and attention to detail that defines us.</p>
+                </div>
+                <div class="about-image"></div>
+            </div>
+
+            
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2025 Quick Bite. All rights reserved.</p>
+            <p>123 Graphic Era Hill University, Near Tularam Mandir, Haldwani, Uttarakhand</p>
+            <p>Open Monday-Friday 7am-7pm | Weekends 8am-6pm</p>
+            <div class="social-links">
+                <a href="#" aria-label="Facebook">📱</a>
+                <a href="#" aria-label="Instagram">📸</a>
+                <a href="#" aria-label="Twitter">🐦</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

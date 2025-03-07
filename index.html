@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foodie - Smart Food Court System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff6347;
+            --secondary: #28a745;
+            --accent: #ffd700;
+            --dark: #2c3e50;
+            --light: #f7f9fc;
+        }
+
+        body {
+            font-family: 'Roboto', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f7f9fc 0%, #d9e4f5 100%);
+            color: #333;
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: #ecf0f1;
+        }
+
+        body.dark-mode .menu-item,
+        body.dark-mode .auth-section,
+        body.dark-mode .cart-dropdown,
+        body.dark-mode .payment-content,
+        body.dark-mode .history-content,
+        body.dark-mode .assistant-modal,
+        body.dark-mode .admin-block {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--primary);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .navbar-menu button,
+        .navbar-menu select {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .navbar-menu button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .search-bar {
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            width: 200px;
+        }
+
+        .cart-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cart-dropdown {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            padding: 20px;
+            display: none;
+            z-index: 1001;
+        }
+
+        .cart-dropdown.active {
+            display: block;
+        }
+
+        main {
+            max-width: 1300px;
+            margin: 100px auto 0;
+            padding: 30px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .menu-item {
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-8px);
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .menu-item .badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--secondary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .menu-item .rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--accent);
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--secondary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .auth-section {
+            background: #fff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .auth-section h2 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .auth-section input,
+        .auth-section select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .auth-section button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .auth-section button:hover {
+            background: #e5533d;
+        }
+
+        .auth-toggle {
+            margin-top: 15px;
+            color: #666;
+        }
+
+        .auth-toggle a {
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .payment-modal,
+        .history-modal,
+        .assistant-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .payment-modal.active,
+        .history-modal.active,
+        .assistant-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .payment-content,
+        .history-content,
+        .assistant-modal {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            width: 500px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #e5533d;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .assistant-modal {
+            bottom: 20px;
+            left: 20px;
+            width: 400px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: #ddd;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .pages a{
+            text-decoration: none;
+            margin: 5px;
+            color:white;
+            display: inline;
+            font-size:10px;
+            font-weight: bolder;
+
+        }
+        .search-bar option
+        {
+            color:black;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">Foodie</div>
+        <div class="navbar-menu">
+            <input type="text" id="search-bar" class="search-bar" placeholder="Search menu...">
+            <select id="category-filter-nav">
+                <option value="all">All Categories</option>
+                <option value="burgers">Burgers</option>
+                <option value="pizza">Pizza</option>
+                <option value="tacos">Tacos</option>
+                <option value="sushi">Sushi</option>
+                <option value="pasta">Pasta</option>
+                <option value="desserts">Desserts</option>
+            </select>
+            <br>
+            <div class="pages">
+                <a href="/about.html">About Us</a>
+                <a href="/admin2.html">Admin </a>
+                <a href="cafe2.html">Hotel Management</a>
+                <a href="login.html">Login</a>
+            </div>
+            <button id="login-button">Login</button>
+            <button id="logout-button" class="hidden">Logout</button>
+            <span id="user-role" class="hidden"></span>
+            <button id="cart-button">Cart (<span id="cart-count">0</span>)</button>
+            <button id="voice-button">🎤 Voice</button>
+            <button id="assistant-button">🤖 Assistant</button>
+            <button id="history-button">📜 History</button>
+            <button id="dark-mode-toggle">🌙 Dark Mode</button>
+        </div>
+        <div class="cart-dropdown" id="cart-dropdown">
+            <h3>Your Order</h3>
+            <ul id="cart-items"></ul>
+            <p>Total: $<span id="cart-total">0.00</span></p>
+            <button id="place-order">Place Order</button>
+            <button id="clear-cart">Clear Cart</button>
+        </div>
+    </nav>
+
+    <main>
+        <section id="auth-section" class="auth-section">
+            <h2 id="auth-title">Login</h2>
+            <form id="auth-form">
+                <input type="email" id="auth-email" placeholder="Email" required>
+                <input type="password" id="auth-password" placeholder="Password" required>
+                <select id="user-role-select" class="hidden">
+                    <option value="customer">Customer</option>
+                    <option value="kitchen">Kitchen Staff</option>
+                    <option value="admin">Administrator</option>
+                </select>
+                <input type="text" id="auth-username" placeholder="Username" class="hidden" required>
+                <button type="submit" id="auth-submit">Login</button>
+            </form>
+            <div class="auth-toggle">
+                <span id="toggle-text">Don't have an account? </span>
+                <a id="toggle-link">Sign Up</a>
+            </div>
+        </section>
+
+        <section id="menu-section" class="hidden">
+            <h2>Menu</h2>
+            <div class="filter-section">
+                <select id="category-filter">
+                    <option value="all">All Categories</option>
+                    <option value="burgers">Burgers</option>
+                    <option value="pizza">Pizza</option>
+                    <option value="tacos">Tacos</option>
+                    <option value="sushi">Sushi</option>
+                    <option value="pasta">Pasta</option>
+                    <option value="desserts">Desserts</option>
+                </select>
+                <label><input type="checkbox" id="vegetarian-filter"> Vegetarian Only</label>
+            </div>
+            <div id="menu-items" class="menu-grid"></div>
+        </section>
+
+        <section id="kitchen-section" class="hidden">
+            <h2>Kitchen Dashboard</h2>
+            <ul id="kitchen-orders"></ul>
+        </section>
+
+        <section id="admin-block" class="hidden">
+            <h2>Admin Dashboard</h2>
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="menu">Menu Management</button>
+                <button class="tab-btn" data-tab="users">User Management</button>
+                <button class="tab-btn" data-tab="analytics">Analytics</button>
+            </div>
+            <div id="admin-menu" class="tab-content active">
+                <form id="add-item-form">
+                    <input type="text" id="item-name" placeholder="Item Name" required>
+                    <input type="number" id="item-price" placeholder="Price" step="0.01" required>
+                    <input type="url" id="item-image" placeholder="Image URL">
+                    <select id="item-category">
+                        <option value="burgers">Burgers</option>
+                        <option value="pizza">Pizza</option>
+                        <option value="tacos">Tacos</option>
+                        <option value="sushi">Sushi</option>
+                        <option value="pasta">Pasta</option>
+                        <option value="desserts">Desserts</option>
+                    </select>
+                    <label><input type="checkbox" id="item-vegetarian"> Vegetarian</label>
+                    <button type="submit">Add Item</button>
+                </form>
+            </div>
+            <div id="admin-users" class="tab-content hidden">
+                <h3>User Management</h3>
+                <ul id="user-list"></ul>
+                <button id="add-user">Add New User</button>
+            </div>
+            <div id="admin-analytics" class="tab-content hidden">
+                <h3>Analytics</h3>
+                <p>Total Orders: <span id="total-orders">0</span></p>
+                <p>Total Revenue: $<span id="total-revenue">0.00</span></p>
+                <p>Popular Item: <span id="popular-item">N/A</span></p>
+            </div>
+        </section>
+
+        <section id="order-tracking" class="hidden">
+            <h2>Order Status</h2>
+            <p id="order-status">No orders yet.</p>
+            <p id="token-number" class="hidden">Token: <span></span></p>
+        </section>
+
+        <section id="deals-section" class="hidden">
+            <h2>Today’s Deals</h2>
+            <ul id="deals-list"></ul>
+        </section>
+    </main>
+
+    <div id="notification" class="notification"></div>
+    <div id="payment-modal" class="payment-modal">
+        <div class="payment-content">
+            <h3>Payment</h3>
+            <p>Total: $<span id="payment-total">0.00</span></p>
+            <select id="payment-method">
+                <option value="card">Credit Card</option>
+                <option value="cash">Cash on Pickup</option>
+                <option value="upi">UPI</option>
+            </select>
+            <input type="text" id="promo-code" placeholder="Promo Code">
+            <button id="apply-promo">Apply Promo</button>
+            <button id="confirm-payment">Confirm Payment</button>
+            <button id="cancel-payment">Cancel</button>
+        </div>
+    </div>
+
+    <div id="history-modal" class="history-modal">
+        <div class="history-content">
+            <h3>Order History</h3>
+            <ul id="order-history"></ul>
+            <button id="close-history">Close</button>
+        </div>
+    </div>
+
+    <div id="assistant-modal" class="assistant-modal">
+        <h3>Foodie Assistant</h3>
+        <p id="assistant-response">Hi! How can I assist you today?</p>
+        <input type="text" id="assistant-input" placeholder="Type or speak your query...">
+        <button id="assistant-submit">Send</button>
+    </div>
+
+    <script>
+        const elements = {
+            authSection: document.getElementById("auth-section"),
+            menuSection: document.getElementById("menu-section"),
+            kitchenSection: document.getElementById("kitchen-section"),
+            adminBlock: document.getElementById("admin-block"),
+            orderTracking: document.getElementById("order-tracking"),
+            dealsSection: document.getElementById("deals-section"),
+            cartButton: document.getElementById("cart-button"),
+            cartDropdown: document.getElementById("cart-dropdown"),
+            authForm: document.getElementById("auth-form"),
+            menuItems: document.getElementById("menu-items"),
+            cartItems: document.getElementById("cart-items"),
+            cartTotal: document.getElementById("cart-total"),
+            cartCount: document.getElementById("cart-count"),
+            orderStatus: document.getElementById("order-status"),
+            tokenNumber: document.getElementById("token-number").querySelector("span"),
+            kitchenOrders: document.getElementById("kitchen-orders"),
+            notification: document.getElementById("notification"),
+            paymentModal: document.getElementById("payment-modal"),
+            paymentTotal: document.getElementById("payment-total"),
+            addItemForm: document.getElementById("add-item-form"),
+            assistantModal: document.getElementById("assistant-modal"),
+            assistantResponse: document.getElementById("assistant-response"),
+            assistantInput: document.getElementById("assistant-input"),
+            historyModal: document.getElementById("history-modal"),
+            orderHistory: document.getElementById("order-history"),
+            categoryFilter: document.getElementById("category-filter"),
+            categoryFilterNav: document.getElementById("category-filter-nav"),
+            vegetarianFilter: document.getElementById("vegetarian-filter"),
+            dealsList: document.getElementById("deals-list"),
+            searchBar: document.getElementById("search-bar"),
+            darkModeToggle: document.getElementById("dark-mode-toggle"),
+            userList: document.getElementById("user-list"),
+            addUserButton: document.getElementById("add-user"),
+            totalOrders: document.getElementById("total-orders"),
+            totalRevenue: document.getElementById("total-revenue"),
+            popularItem: document.getElementById("popular-item")
+        };
+
+        let cart = [];
+        let user = null;
+        let orders = [];
+        let isSignupMode = false;
+        let users = [{ email: "admin@foodie.com", username: "admin", role: "admin" }];
+        let menuItems = [
+            { id: 1, name: "Cheese Burger", price: 6.99, image: "https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg", category: "burgers", vegetarian: false },
+            { id: 2, name: "Margherita Pizza", price: 9.99, image: "https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg", category: "pizza", vegetarian: true },
+            { id: 3, name: "Chicken Tacos", price: 5.49, image: "https://images.pexels.com/photos/4958641/pexels-photo-4958641.jpeg", category: "tacos", vegetarian: false },
+            { id: 4, name: "Sushi Platter", price: 12.99, image: "https://images.pexels.com/photos/1148086/pexels-photo-1148086.jpeg", category: "sushi", vegetarian: false },
+            { id: 5, name: "Pasta Alfredo", price: 8.49, image: "https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg", category: "pasta", vegetarian: true },
+            { id: 6, name: "Veggie Burger", price: 6.49, image: "https://images.pexels.com/photos/70497/pexels-photo-70497.jpeg", category: "burgers", vegetarian: true },
+            { id: 7, name: "Pepperoni Pizza", price: 10.99, image: "https://images.pexels.com/photos/905847/pexels-photo-905847.jpeg", category: "pizza", vegetarian: false },
+            { id: 8, name: "Fish Tacos", price: 6.99, image: "https://images.pexels.com/photos/10788878/pexels-photo-10788878.jpeg", category: "tacos", vegetarian: false },
+            { id: 9, name: "Chocolate Lava Cake", price: 4.99, image: "https://images.pexels.com/photos/3026809/pexels-photo-3026809.jpeg", category: "desserts", vegetarian: true },
+            { id: 10, name: "Mango Sushi Roll", price: 11.49, image: "https://images.pexels.com/photos/209808/pexels-photo-209808.jpeg", category: "sushi", vegetarian: true }
+        ];
+
+        const deals = [
+            { name: "Burger Bonanza", items: ["Cheese Burger", "Veggie Burger"], discount: 0.15 },
+            { name: "Pizza Party", items: ["Margherita Pizza", "Pepperoni Pizza"], discount: 0.20 }
+        ];
+
+        const api = {
+            getMenu: () => Promise.resolve(menuItems),
+            saveOrder: (order) => Promise.resolve(orders.push(order)),
+            getOrders: () => Promise.resolve(orders)
+        };
+
+        document.getElementById("toggle-link").addEventListener("click", () => {
+            isSignupMode = !isSignupMode;
+            document.getElementById("auth-title").textContent = isSignupMode ? "Sign Up" : "Login";
+            document.getElementById("auth-submit").textContent = isSignupMode ? "Sign Up" : "Login";
+            document.getElementById("toggle-text").textContent = isSignupMode ? "Already have an account?" : "Don't have an account?";
+            document.getElementById("toggle-link").textContent = isSignupMode ? "Login" : "Sign Up";
+            document.getElementById("user-role-select").classList.toggle("hidden", !isSignupMode);
+            document.getElementById("auth-username").classList.toggle("hidden", !isSignupMode);
+        });
+
+        elements.authForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("auth-email").value;
+            const password = document.getElementById("auth-password").value;
+            if (isSignupMode) {
+                const username = document.getElementById("auth-username").value;
+                const role = document.getElementById("user-role-select").value;
+                user = { email, username, role };
+                users.push(user);
+                showNotification(`Account created for ${username}! Please log in.`);
+                isSignupMode = false;
+                document.getElementById("toggle-link").click();
+            } else {
+                user = { email, role: "customer" };
+                if (email.includes("kitchen")) user.role = "kitchen";
+                if (email.includes("admin")) user.role = "admin";
+                showSectionsBasedOnRole();
+                document.getElementById("user-role").textContent = `(${user.role})`;
+                document.getElementById("user-role").classList.remove("hidden");
+                greetUser();
+            }
+        });
+
+        function showSectionsBasedOnRole() {
+            elements.authSection.classList.add("hidden");
+            document.getElementById("login-button").classList.add("hidden");
+            document.getElementById("logout-button").classList.remove("hidden");
+            if (user.role === "customer") {
+                elements.menuSection.classList.remove("hidden");
+                elements.orderTracking.classList.remove("hidden");
+                elements.dealsSection.classList.remove("hidden");
+                renderMenu();
+                renderDeals();
+            } else if (user.role === "kitchen") {
+                elements.kitchenSection.classList.remove("hidden");
+                updateKitchenDashboard();
+            } else if (user.role === "admin") {
+                elements.adminBlock.classList.remove("hidden");
+                elements.menuSection.classList.remove("hidden");
+                renderMenu();
+                updateAdminDashboard();
+            }
+        }
+
+        document.getElementById("logout-button").addEventListener("click", () => {
+            user = null;
+            location.reload();
+        });
+
+        function renderMenu(searchQuery = "") {
+            const category = elements.categoryFilter.value;
+            const vegetarian = elements.vegetarianFilter.checked;
+            elements.menuItems.innerHTML = "";
+            api.getMenu().then(items => {
+                items.filter(item => 
+                    (category === "all" || item.category === category) &&
+                    (!vegetarian || item.vegetarian) &&
+                    (!searchQuery || item.name.toLowerCase().includes(searchQuery))
+                ).forEach(item => {
+                    const div = document.createElement("div");
+                    div.classList.add("menu-item");
+                    div.innerHTML = `
+                        <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/280x180?text=${item.name}'">
+                        ${item.vegetarian ? `<span class="badge">Veg</span>` : ""}
+                        <span class="rating">4.5 ★</span>
+                        <div class="menu-item-content">
+                            <h3>${item.name}</h3>
+                            <p>$${item.price.toFixed(2)}</p>
+                            ${user.role === "customer" ? `<button onclick="addToCart(${item.id}, '${item.name}', ${item.price})">Add to Cart</button>` : ""}
+                            ${user.role === "admin" ? `<button onclick="removeMenuItem(${item.id})">Remove</button>` : ""}
+                        </div>
+                    `;
+                    elements.menuItems.appendChild(div);
+                });
+            });
+        }
+
+        elements.categoryFilter.addEventListener("change", () => renderMenu());
+        elements.vegetarianFilter.addEventListener("change", () => renderMenu());
+        elements.categoryFilterNav.addEventListener("change", () => {
+            elements.categoryFilter.value = elements.categoryFilterNav.value;
+            renderMenu();
+        });
+        elements.searchBar.addEventListener("input", () => renderMenu(elements.searchBar.value.toLowerCase()));
+
+        function renderDeals() {
+            elements.dealsList.innerHTML = "";
+            deals.forEach(deal => {
+                const li = document.createElement("li");
+                li.textContent = `${deal.name}: ${deal.items.join(" + ")} - ${deal.discount * 100}% off`;
+                elements.dealsList.appendChild(li);
+            });
+        }
+
+        function addToCart(id, name, price) {
+            cart.push({ id, name, price });
+            updateCart();
+            showNotification(`${name} added to cart!`);
+        }
+
+        function removeFromCart(index) {
+            const removedItem = cart.splice(index, 1)[0];
+            updateCart();
+            showNotification(`${removedItem.name} removed from cart!`);
+        }
+
+        function clearCart() {
+            cart = [];
+            updateCart();
+            showNotification("Cart cleared!");
+        }
+
+        function updateCart() {
+            elements.cartItems.innerHTML = "";
+            let total = 0;
+            cart.forEach((item, index) => {
+                const li = document.createElement("li");
+                li.innerHTML = `${item.name} - $${item.price.toFixed(2)} <button onclick="removeFromCart(${index})">Remove</button>`;
+                elements.cartItems.appendChild(li);
+                total += item.price;
+            });
+            elements.cartTotal.textContent = total.toFixed(2);
+            elements.cartCount.textContent = cart.length;
+            elements.paymentTotal.textContent = total.toFixed(2);
+        }
+
+        elements.cartButton.addEventListener("click", () => {
+            elements.cartDropdown.classList.toggle("active");
+        });
+
+        document.getElementById("place-order").addEventListener("click", () => {
+            if (cart.length === 0) return showNotification("Cart is empty!");
+            elements.paymentModal.classList.add("active");
+        });
+
+        document.getElementById("clear-cart").addEventListener("click", clearCart);
+
+        document.getElementById("apply-promo").addEventListener("click", () => {
+            const promo = document.getElementById("promo-code").value.toUpperCase();
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            if (promo === "FOODIE10") {
+                total *= 0.9;
+                elements.paymentTotal.textContent = total.toFixed(2);
+                showNotification("10% discount applied!");
+            } else {
+                showNotification("Invalid promo code");
+            }
+        });
+
+        document.getElementById("confirm-payment").addEventListener("click", () => {
+            const paymentMethod = document.getElementById("payment-method").value;
+            const token = Math.floor(1000 + Math.random() * 9000);
+            let total = parseFloat(elements.paymentTotal.textContent);
+            const order = {
+                items: [...cart],
+                total,
+                status: "Pending",
+                token,
+                user: user.email,
+                timestamp: new Date().toLocaleString()
+            };
+            api.saveOrder(order).then(() => {
+                cart = [];
+                updateCart();
+                elements.paymentModal.classList.remove("active");
+                updateOrderStatus(order);
+                updateKitchenDashboard();
+                updateAdminDashboard();
+                showNotification(`Order placed! Token: ${token}`);
+                simulateOrderProgress(token);
+            });
+        });
+
+        document.getElementById("cancel-payment").addEventListener("click", () => {
+            elements.paymentModal.classList.remove("active");
+        });
+
+        function updateOrderStatus(order) {
+            elements.orderStatus.textContent = `Status: ${order.status} (Placed: ${order.timestamp})`;
+            elements.tokenNumber.textContent = order.token;
+            elements.tokenNumber.parentElement.classList.remove("hidden");
+        }
+
+        function simulateOrderProgress(token) {
+            const order = orders.find(o => o.token === token);
+            setTimeout(() => {
+                order.status = "Preparing";
+                updateOrderStatus(order);
+                updateKitchenDashboard();
+                showNotification(`Token ${token}: Preparing`);
+                setTimeout(() => {
+                    order.status = "Ready";
+                    updateOrderStatus(order);
+                    updateKitchenDashboard();
+                    showNotification(`Token ${token}: Ready for pickup!`);
+                }, 5000);
+            }, 5000);
+        }
+
+        function updateKitchenDashboard() {
+            elements.kitchenOrders.innerHTML = "";
+            api.getOrders().then(orders => {
+                orders.forEach(order => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        Token ${order.token}: ${order.items.map(i => i.name).join(", ")} - ${order.status} ($${order.total.toFixed(2)})
+                        ${order.status !== "Ready" ? `<button onclick="markAsReady(${order.token})">Mark Ready</button>` : ""}
+                    `;
+                    elements.kitchenOrders.appendChild(li);
+                });
+            });
+        }
+
+        function markAsReady(token) {
+            const order = orders.find(o => o.token === token);
+            order.status = "Ready";
+            updateKitchenDashboard();
+            showNotification(`Token ${token} marked as ready!`);
+        }
+
+        elements.addItemForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const newItem = {
+                id: menuItems.length + 1,
+                name: document.getElementById("item-name").value,
+                price: parseFloat(document.getElementById("item-price").value),
+                image: document.getElementById("item-image").value || "https://via.placeholder.com/280x180",
+                category: document.getElementById("item-category").value,
+                vegetarian: document.getElementById("item-vegetarian").checked
+            };
+            menuItems.push(newItem);
+            renderMenu();
+            showNotification(`${newItem.name} added to menu!`);
+            e.target.reset();
+        });
+
+        function removeMenuItem(id) {
+            menuItems = menuItems.filter(item => item.id !== id);
+            renderMenu();
+            showNotification("Item removed from menu!");
+        }
+
+        function showNotification(message) {
+            elements.notification.textContent = message;
+            elements.notification.style.display = "block";
+            setTimeout(() => elements.notification.style.display = "none", 3000);
+        }
+
+        document.getElementById("history-button").addEventListener("click", () => {
+            elements.historyModal.classList.add("active");
+            elements.orderHistory.innerHTML = "";
+            api.getOrders().then(orders => {
+                orders.filter(o => o.user === user.email).forEach(order => {
+                    const li = document.createElement("li");
+                    li.textContent = `Token ${order.token}: ${order.items.map(i => i.name).join(", ")} - $${order.total.toFixed(2)} (${order.status})`;
+                    elements.orderHistory.appendChild(li);
+                });
+            });
+        });
+
+        document.getElementById("close-history").addEventListener("click", () => {
+            elements.historyModal.classList.remove("active");
+        });
+
+        document.getElementById("voice-button").addEventListener("click", () => {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.start();
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript.toLowerCase();
+                handleAssistantCommand(transcript, true);
+            };
+        });
+
+        document.getElementById("assistant-button").addEventListener("click", () => {
+            elements.assistantModal.classList.toggle("active");
+        });
+
+        document.getElementById("assistant-submit").addEventListener("click", () => {
+            const query = elements.assistantInput.value.toLowerCase();
+            handleAssistantCommand(query, false);
+            elements.assistantInput.value = "";
+        });
+
+        function handleAssistantCommand(query, isVoice) {
+            let response = "Sorry, I didn’t catch that. Try something like 'add pizza' or 'show deals'.";
+            if (query.includes("signup") || query.includes("sign up")) {
+                isSignupMode = true;
+                document.getElementById("toggle-link").click();
+                response = "Switched to signup mode. Please fill in the details.";
+            } else if (query.includes("login") || query.includes("log in")) {
+                isSignupMode = false;
+                document.getElementById("toggle-link").click();
+                response = "Switched to login mode. Enter your email and password.";
+            } else if (query.includes("add")) {
+                const itemName = query.split("add")[1]?.trim();
+                const item = menuItems.find(i => i.name.toLowerCase().includes(itemName));
+                if (item) {
+                    addToCart(item.id, item.name, item.price);
+                    response = `${item.name} added to cart!`;
+                } else {
+                    response = "Item not found. Try something from the menu!";
+                }
+            } else if (query.includes("remove")) {
+                const itemName = query.split("remove")[1]?.trim();
+                const index = cart.findIndex(i => i.name.toLowerCase().includes(itemName));
+                if (index !== -1) {
+                    removeFromCart(index);
+                    response = "Item removed from cart!";
+                } else {
+                    response = "Item not in cart!";
+                }
+            } else if (query.includes("clear cart")) {
+                clearCart();
+                response = "Cart cleared!";
+            } else if (query.includes("place order") || query.includes("order now")) {
+                if (cart.length > 0) {
+                    elements.paymentModal.classList.add("active");
+                    response = "Opening payment options...";
+                } else {
+                    response = "Your cart is empty!";
+                }
+            } else if (query.includes("menu")) {
+                const category = query.split("menu")[1]?.trim();
+                response = "Here’s the menu: " + menuItems
+                    .filter(i => !category || i.category.includes(category))
+                    .map(i => `${i.name} ($${i.price})${i.vegetarian ? " (V)" : ""}`).join(", ");
+            } else if (query.includes("status")) {
+                const latestOrder = orders.find(o => o.user === user.email);
+                response = latestOrder ? `Your order (Token ${latestOrder.token}) is ${latestOrder.status}` : "No orders yet.";
+            } else if (query.includes("history")) {
+                elements.historyModal.classList.add("active");
+                response = "Opening your order history...";
+            } else if (query.includes("vegetarian")) {
+                response = "Vegetarian options: " + menuItems
+                    .filter(i => i.vegetarian)
+                    .map(i => `${i.name} ($${i.price})`).join(", ");
+            } else if (query.includes("recommend") || query.includes("suggest")) {
+                const randomItem = menuItems[Math.floor(Math.random() * menuItems.length)];
+                response = `How about ${randomItem.name}? It’s $${randomItem.price}! Say "add ${randomItem.name}" to add it.`;
+            } else if (query.includes("deals") || query.includes("discount")) {
+                response = "Today’s deals: " + deals.map(d => `${d.name} (${d.items.join(" + ")}) - ${d.discount * 100}% off`).join(", ");
+            }
+            elements.assistantResponse.textContent = response;
+            if (isVoice) speak(response);
+        }
+
+        function greetUser() {
+            const greeting = `Welcome to Foodie, ${user.email.split("@")[0]}! Try commands like "add pizza," "show deals," or "recommend food."`;
+            elements.assistantResponse.textContent = greeting;
+            speak(greeting);
+        }
+
+        function speak(text) {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(text);
+            synth.speak(utterance);
+        }
+
+        elements.darkModeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            elements.darkModeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️ Light Mode" : "🌙 Dark Mode";
+        });
+
+        function updateAdminDashboard() {
+            if (user.role === "admin") {
+                elements.userList.innerHTML = "";
+                users.forEach(u => {
+                    const li = document.createElement("li");
+                    li.textContent = `${u.username} (${u.role}) - ${u.email}`;
+                    elements.userList.appendChild(li);
+                });
+
+                elements.totalOrders.textContent = orders.length;
+                const revenue = orders.reduce((sum, o) => sum + o.total, 0);
+                elements.totalRevenue.textContent = revenue.toFixed(2);
+                const itemCount = {};
+                orders.forEach(o => o.items.forEach(i => itemCount[i.name] = (itemCount[i.name] || 0) + 1));
+                const popular = Object.entries(itemCount).sort((a, b) => b[1] - a[1])[0];
+                elements.popularItem.textContent = popular ? popular[0] : "N/A";
+            }
+        }
+
+        elements.addUserButton.addEventListener("click", () => {
+            const email = prompt("Enter user email:");
+            const username = prompt("Enter username:");
+            const role = prompt("Enter role (customer/kitchen/admin):");
+            if (email && username && role) {
+                users.push({ email, username, role });
+                updateAdminDashboard();
+                showNotification(`User ${username} added!`);
+            }
+        });
+
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
+                btn.classList.add("active");
+                document.getElementById(`admin-${btn.dataset.tab}`).classList.remove("hidden");
+                document.getElementById(`admin-${btn.dataset.tab}`).classList.add("active");
+            });
+        });
+    </script>
+</body>
+</html>
